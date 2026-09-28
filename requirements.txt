@@ -1,0 +1,13 @@
+langgraph
+langchain-core
+langchain-ollama
+langchain-chroma
+langchain-huggingface
+sentence-transformers
+ollama
+ddgs
+streamlit
+python-dotenv
+pandas
+pytest
+requests
