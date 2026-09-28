@@ -138,11 +138,26 @@ WEB_MAX_RESULTS=4
 `.env.example` must contain the same keys with placeholder values. **Never commit `.env`.**
 
 ### 4.4 Run
+
+Make sure your virtual environment is activated and you have set your `OLLAMA_API_KEY` in `.env`.
+
+**To run the interactive Streamlit UI:**
 ```bash
-streamlit run app.py          # UI  → http://localhost:8501
-python run_tests.py           # 10-question test suite
-pytest -q                     # smoke tests (no network needed)
+streamlit run app.py
 ```
+This will open the web app at `http://localhost:8501`.
+
+**To run the test suite:**
+```bash
+python run_tests.py
+```
+This runs 10 evaluation questions and saves the results to `results.csv`.
+
+**To run offline smoke tests:**
+```bash
+pytest -q tests/
+```
+
 
 ---
 
