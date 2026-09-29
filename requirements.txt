@@ -5,7 +5,7 @@ langchain-chroma
 langchain-huggingface
 sentence-transformers
 ollama
-ddgs
+duckduckgo-search
 streamlit
 python-dotenv
 pandas

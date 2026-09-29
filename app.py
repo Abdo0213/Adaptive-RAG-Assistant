@@ -51,28 +51,33 @@ if query:
     st.chat_message("user").write(query)
     
     with st.status("Running graph…", expanded=True) as status:
-        state_updates = []
+        full_state = {"documents": [], "path": [], "generation": "No answer generated."}
         try:
-            for node, update in stream_graph(query, max_retries):
-                if "path" in update and update["path"]:
-                    path_str = update["path"][-1]
-                    emoji = {"route_question": "🧭", "retrieve_documents": "📥", "grade_documents": "⚖️", 
-                             "web_search": "🌐", "generate_answer": "✍️", "check_answer": "✅"}.get(node, "▪️")
-                    st.write(f"{emoji} {path_str}")
-                state_updates.append(update)
+            for event in stream_graph(query, max_retries):
+                for node, update in event.items():
+                    if "path" in update and update["path"]:
+                        path_str = update["path"][-1]
+                        emoji = {"route_question": "🧭", "retrieve_documents": "📥", "grade_documents": "⚖️", 
+                                 "web_search": "🌐", "generate_answer": "✍️", "check_answer": "✅"}.get(node, "▪️")
+                        st.write(f"{emoji} {path_str}")
+                        
+                    for k, v in update.items():
+                        if k == "path":
+                            full_state["path"].extend(v)
+                        else:
+                            full_state[k] = v
             status.update(label="Graph complete!", state="complete")
         except Exception as e:
             status.update(label="Graph failed!", state="error")
             st.error(str(e))
             st.stop()
             
-    if state_updates:
-        final_state = state_updates[-1]
-        answer = final_state.get("generation", "No answer generated.")
-        grounded = final_state.get("grounded", False)
-        useful = final_state.get("useful", False)
-        retries = final_state.get("retries", 0)
-        docs = final_state.get("documents", [])
+    if True:
+        answer = full_state.get("generation", "No answer generated.")
+        grounded = full_state.get("grounded", False)
+        useful = full_state.get("useful", False)
+        retries = full_state.get("retries", 0)
+        docs = full_state.get("documents", [])
         
         st.subheader("Answer")
         if grounded and useful:
@@ -85,7 +90,7 @@ if query:
         for d in docs:
             st.markdown(f"- **{d['origin'].upper()}**: {d['source']}")
             
-        st.session_state.history.append({"question": query, "answer": answer, "path": final_state.get("path", [])})
+        st.session_state.history.append({"question": query, "answer": answer, "path": full_state.get("path", [])})
         
 if st.session_state.history:
     with st.expander("History"):
